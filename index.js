@@ -1,14 +1,12 @@
-require('dotenv').config();
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+require('dotenv').config(); // Yeh line sabse top par zaroori hai
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, REST, Routes } = require('discord.js');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const SERVER_IP = "rex-2.drexhost.in:19121";
 const SHOP_LINK = "https://volex-store.onrender.com";
 
-const { REST, Routes } = require('discord.js');
-
-const TOKEN = '';
+// TOKEN ko yahan se hata diya hai kyunki hum .env use kar rahe hain
 const CLIENT_ID = '1523523459877961728';
 
 const commands = [
@@ -18,26 +16,26 @@ const commands = [
   },
 ];
 
-const rest = new REST({ version: '10' }).setToken(TOKEN);
+// .env se token le rahe hain
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 client.once('ready', async () => {
     try {
         console.log('Started refreshing application (/) commands.');
 
-        // Global commands register karna
         await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
 
         console.log('Successfully reloaded application (/) commands.');
         console.log(`Bot login ho gaya hai: ${client.user.tag}!`);
     } catch (error) {
-        console.error(error);
+        console.error('Error refreshing commands:', error);
     }
 });
 
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() && !interaction.isButton()) return;
 
-    if (interaction.commandName === 'info') {
+    if (interaction.isCommand() && interaction.commandName === 'info') {
         const embed = new EmbedBuilder()
             .setColor(0x00FF00)
             .setTitle('✨ **Welcome to Our Server** ✨')
@@ -59,4 +57,5 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+// Yahan bhi process.env.TOKEN ka use kiya hai
 client.login(process.env.TOKEN);
